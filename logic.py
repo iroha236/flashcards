@@ -64,8 +64,13 @@ def changes_occurred(name, text):
 # Get the names of all the sets in the cards directory
 def created_sets():
     curr_directory = os.getcwd()
+    
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
 
-    os.chdir("cards")
+        os.chdir("cards")
 
     names = storage.get_all_names()
 
