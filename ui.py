@@ -205,11 +205,16 @@ def delete(curr_window, sets):
         confirm = messagebox.askquestion("Delete Set", "Delete '" + sets.get(sets.curselection()[0]) + "'?", parent = curr_window, default = "no")
 
         if(confirm == "yes"):
-            logic.process_deletion(sets.get(sets.curselection()[0]))
+            try:
+                logic.process_deletion(sets.get(sets.curselection()[0]))
 
-            curr_window.destroy()
+                curr_window.destroy()
 
-            messagebox.showinfo("Set Deletion Confirmation", "Set deleted successfully.")
+                messagebox.showinfo("Set Deletion Confirmation", "Set deleted successfully.")
+            except FileNotFoundError:
+                logic.to_flashcards_dir()
+
+                messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
         else:
             pass
 
@@ -220,43 +225,50 @@ def edit(curr_window, sets):
     else:
         name = sets.get(sets.curselection()[0])
 
-        curr_window.destroy()
+        try:
+            text = logic.get_set_text(name)
 
-        editing_window = Toplevel(window)
+            curr_window.destroy()
 
-        editing_window.title("Edit Set (Editing: " + name + ")")
-        editing_window.geometry("480x640")
-        editing_window.resizable(False, False)
-        editing_window.grab_set()
+            editing_window = Toplevel(window)
 
-        editing_window_icon = PhotoImage(file = "res/main_logo.png")
-        editing_window.iconphoto(False, editing_window_icon)
+            editing_window.title("Edit Set (Editing: " + name + ")")
+            editing_window.geometry("480x640")
+            editing_window.resizable(False, False)
+            editing_window.grab_set()
 
-        instructions_title = tkinter.Label(editing_window, text = "Instructions\n\nSpecify your flashcards in the form of a line of text.\n" +
-                                                                  "Example: What is 1 + 1?~2\n" +
-                                                                  "The text left of the '~' represents the front of the flashcard, while the\n" +
-                                                                  "the text right of it represents the back. Each line of text represents one\n" +
-                                                                  "flashcard, and you can write as many of them as you wish. Flashcards\n" +
-                                                                  "will be automatically randomized, so the order you write them in does not\n" +
-                                                                  "matter. Lastly, lines that do not match the specified pattern will be ignored\n" +
-                                                                  "when the flashcards are generated, so please follow the format properly.")
-        instructions_title.place(relx = 0.5, rely = 0.15, anchor = "center")
+            editing_window_icon = PhotoImage(file = "res/main_logo.png")
+            editing_window.iconphoto(False, editing_window_icon)
 
-        scrollbar = tkinter.Scrollbar(editing_window, orient = "horizontal")
+            instructions_title = tkinter.Label(editing_window, text = "Instructions\n\nSpecify your flashcards in the form of a line of text.\n" +
+                                                                    "Example: What is 1 + 1?~2\n" +
+                                                                    "The text left of the '~' represents the front of the flashcard, while the\n" +
+                                                                    "the text right of it represents the back. Each line of text represents one\n" +
+                                                                    "flashcard, and you can write as many of them as you wish. Flashcards\n" +
+                                                                    "will be automatically randomized, so the order you write them in does not\n" +
+                                                                    "matter. Lastly, lines that do not match the specified pattern will be ignored\n" +
+                                                                    "when the flashcards are generated, so please follow the format properly.")
+            instructions_title.place(relx = 0.5, rely = 0.15, anchor = "center")
 
-        box = scrolledtext.ScrolledText(editing_window, xscrollcommand = scrollbar.set, width = 50, height = 21, wrap = "none")
-        box.insert(tkinter.INSERT, logic.get_set_text(name))
-        box.focus()
-        box.place(relx = 0.5, rely = 0.57, anchor = "center")
+            scrollbar = tkinter.Scrollbar(editing_window, orient = "horizontal")
 
-        scrollbar.config(command = box.xview)
-        scrollbar.place(relx = 0.484, y = 542, anchor = "center", width = 405)
+            box = scrolledtext.ScrolledText(editing_window, xscrollcommand = scrollbar.set, width = 50, height = 21, wrap = "none")
+            box.insert(tkinter.INSERT, text)
+            box.focus()
+            box.place(relx = 0.5, rely = 0.57, anchor = "center")
 
-        save_button = tkinter.Button(editing_window, text = "Save", width = 20, height = 2, command = lambda: save(editing_window, name, box.get("1.0", "end-1c")))
-        save_button.place(relx = 0.7, rely = 0.925, anchor = "center")
+            scrollbar.config(command = box.xview)
+            scrollbar.place(relx = 0.484, y = 542, anchor = "center", width = 405)
 
-        leave_button = tkinter.Button(editing_window, text = "Leave", width = 20, height = 2, command = lambda: leave_edit(editing_window, name, box.get("1.0", "end-1c")))
-        leave_button.place(relx = 0.3, rely = 0.925, anchor = "center")
+            save_button = tkinter.Button(editing_window, text = "Save", width = 20, height = 2, command = lambda: save(editing_window, name, box.get("1.0", "end-1c")))
+            save_button.place(relx = 0.7, rely = 0.925, anchor = "center")
+
+            leave_button = tkinter.Button(editing_window, text = "Leave", width = 20, height = 2, command = lambda: leave_edit(editing_window, name, box.get("1.0", "end-1c")))
+            leave_button.place(relx = 0.3, rely = 0.925, anchor = "center")
+        except FileNotFoundError:
+            logic.to_flashcards_dir()
+
+            messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
 
 # Called upon clicking "Save" from the set editing screen; saves the set and gives a confirmation message
 def save(curr_window, name, text):

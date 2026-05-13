@@ -6,6 +6,7 @@ def store_set(name, text):
     with open(name + ".txt", "w", encoding = "utf-8") as new_file:
         new_file.write(text)
 
+# Get the text of a set text file in the "cards" directory
 def read_set(name):
     set = open(name + ".txt", "r", encoding = "utf-8")
     text = set.read()

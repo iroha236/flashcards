@@ -144,3 +144,7 @@ def is_valid_card(card):
         return True
     
     return False
+
+# Switch to the flashcards directory (from the cards directory)
+def to_flashcards_dir():
+    os.chdir("..")
