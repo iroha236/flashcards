@@ -278,15 +278,25 @@ def save(curr_window, name, text):
 
 # Called upon clicking "Leave" from the set editing screen; either exits the editing screen or prompts users if they have unsaved changes
 def leave_edit(curr_window, name, text):
-    if(logic.changes_occurred(name, text)):
+    try:
+        if(logic.changes_occurred(name, text)):
+            confirm = messagebox.askquestion("Leave", "You have not saved your changes. Are you sure you want to leave?", parent = curr_window, default = "no")
+
+            if(confirm == "yes"):
+                curr_window.destroy()
+            else:
+                pass
+        else:
+            curr_window.destroy()
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
         confirm = messagebox.askquestion("Leave", "You have not saved your changes. Are you sure you want to leave?", parent = curr_window, default = "no")
 
         if(confirm == "yes"):
             curr_window.destroy()
         else:
             pass
-    else:
-        curr_window.destroy()
 
 # Called upon clicking "View" from the view set selection screen; opens an interface that lets users observe their flashcard sets
 # This includes flipping flashcards, proceeding to the next or previous flashcard, or finishing/exiting to the starting menu

@@ -6,7 +6,12 @@ import random
 def create_set(name, text):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     storage.store_set(name, text)
 
