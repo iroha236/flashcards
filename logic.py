@@ -16,7 +16,12 @@ def create_set(name, text):
 def process_deletion(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
     
     storage.delete_set(name)
 
@@ -82,7 +87,12 @@ def created_sets():
 def get_set_text(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     set_text = storage.read_set(name)
 
