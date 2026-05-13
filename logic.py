@@ -37,7 +37,12 @@ def verify_set_name(name):
 def verify_name_exists(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     exists = storage.set_exists(name)
 

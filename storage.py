@@ -29,3 +29,7 @@ def set_exists(name):
 # Get the names of all sets in the "cards" directory
 def get_all_names():
     return glob.glob("*.txt")
+
+# Create the "cards" directory if it is missing
+def create_card_directory():
+    os.mkdir("cards")
