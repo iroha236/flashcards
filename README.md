@@ -8,13 +8,12 @@ _**Version**_ - 1.0
 
 ## Notable Features
 
-_**Flashcard Creation**_ - Name and create large sets of flashcards through a text interface.
-
-_**Flashcard Editing**_ - Modify and create changes to existing sets, or delete ones that you no longer need.
-
-_**Flashcard Viewing**_ - Flip through flashcard sets that you have previously created.
-
-_**Flashcard Randomization**_ - Cards are automatically randomized upon viewing them.
+|Feature||
+|---|---|
+|_**Flashcard Creation**_|Name and create large sets of flashcards through a text interface.|
+|_**Flashcard Editing**_|Modify and create changes to existing sets, or delete ones that you no longer need.|
+|_**Flashcard Viewing**_|Flip through flashcard sets that you have previously created.|
+|_**Flashcard Randomization**_|Cards are automatically randomized upon viewing them.|
 
 ## Requirements
 
