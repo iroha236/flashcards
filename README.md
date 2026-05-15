@@ -8,7 +8,7 @@ _**Version**_ - 1.0
 
 ## Notable Features
 
-|Feature||
+|Feature|Explanation|
 |---|---|
 |_**Flashcard Creation**_|Name and create large sets of flashcards through a text interface.|
 |_**Flashcard Editing**_|Modify and create changes to existing sets, or delete ones that you no longer need.|
