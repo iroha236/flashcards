@@ -358,7 +358,7 @@ def view(curr_window, sets):
 # Called upon clicking "Flip" from the flashcard view screen; flips from the front of the flashcard to the back (or back to front)
 def flip(curr_window, name, cards, curr_card, text):
     try:
-        logic.set_exists(name)
+        logic.set_still_exists(name)
 
         text.config(state = "normal")
 
