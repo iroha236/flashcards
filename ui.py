@@ -306,43 +306,48 @@ def view(curr_window, sets):
     else:
         name = sets.get(sets.curselection()[0])
 
-        if(logic.num_cards(name) < 1):
-            messagebox.showwarning("No Valid Flashcards", "This set does not have any properly formatted flashcards. Please follow the flashcard creation instructions carefully.", parent = curr_window)
-        else:
-            cards = logic.get_cards(name)
-            curr_card = [1]
+        try:
+            if(logic.num_cards(name) < 1):
+                messagebox.showwarning("No Valid Flashcards", "This set does not have any properly formatted flashcards. Please follow the flashcard creation instructions carefully.", parent = curr_window)
+            else:
+                cards = logic.get_cards(name)
+                curr_card = [1]
 
-            curr_window.destroy()
+                curr_window.destroy()
 
-            viewing_window = Toplevel(window)
+                viewing_window = Toplevel(window)
 
-            viewing_window.title(name)
-            viewing_window.geometry("640x400")
-            viewing_window.resizable(False, False)
-            viewing_window.grab_set()
+                viewing_window.title(name)
+                viewing_window.geometry("640x400")
+                viewing_window.resizable(False, False)
+                viewing_window.grab_set()
 
-            viewing_window_icon = PhotoImage(file = "res/main_logo.png")
-            viewing_window.iconphoto(False, viewing_window_icon)
+                viewing_window_icon = PhotoImage(file = "res/main_logo.png")
+                viewing_window.iconphoto(False, viewing_window_icon)
 
-            text = scrolledtext.ScrolledText(viewing_window, width = 49, height = 20, wrap = tkinter.WORD)
-            text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-            text.config(state = "disabled")
-            text.place(relx = 0.38, rely = 0.475, anchor = "center")
+                text = scrolledtext.ScrolledText(viewing_window, width = 49, height = 20, wrap = tkinter.WORD)
+                text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+                text.config(state = "disabled")
+                text.place(relx = 0.38, rely = 0.475, anchor = "center")
 
-            count = tkinter.Label(viewing_window, text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
-            count.place(relx = 0.355, rely = 0.93, anchor = "center")
+                count = tkinter.Label(viewing_window, text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+                count.place(relx = 0.355, rely = 0.93, anchor = "center")
 
-            flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(cards, curr_card, text))
-            flip_button.place(relx = 0.85, rely = 0.2, anchor = "center")
+                flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(cards, curr_card, text))
+                flip_button.place(relx = 0.85, rely = 0.2, anchor = "center")
 
-            next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(name, cards, curr_card, text, count))
-            next_button.place(relx = 0.85, rely = 0.4, anchor = "center")
+                next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(name, cards, curr_card, text, count))
+                next_button.place(relx = 0.85, rely = 0.4, anchor = "center")
 
-            previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(name, cards, curr_card, text, count))
-            previous_button.place(relx = 0.85, rely = 0.6, anchor = "center")
+                previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(name, cards, curr_card, text, count))
+                previous_button.place(relx = 0.85, rely = 0.6, anchor = "center")
 
-            finish_button = tkinter.Button(viewing_window, text = "Finish", width = 15, height = 2, command = lambda: exit(viewing_window))
-            finish_button.place(relx = 0.85, rely = 0.8, anchor = "center")
+                finish_button = tkinter.Button(viewing_window, text = "Finish", width = 15, height = 2, command = lambda: exit(viewing_window))
+                finish_button.place(relx = 0.85, rely = 0.8, anchor = "center")
+        except FileNotFoundError:
+            logic.to_flashcards_dir()
+
+            messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
 
 # Called upon clicking "Flip" from the flashcard view screen; flips from the front of the flashcard to the back (or back to front)
 def flip(cards, curr_card, text):
