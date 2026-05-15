@@ -165,7 +165,7 @@ def to_flashcards_dir():
     os.chdir("..")
 
 # Verify that the current set being viewed exists
-def set_exists(name):
+def set_still_exists(name):
     curr_directory = os.getcwd()
 
     try:

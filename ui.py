@@ -1,5 +1,6 @@
 import logic
 import tkinter
+import _tkinter
 
 from tkinter import *
 from tkinter import scrolledtext
@@ -9,34 +10,39 @@ window = None
 
 # Menu window that opens upon starting application; can choose to view sets, create sets, edit sets, or exit
 def start():
-    global window
+    try:
+        global window
 
-    window = tkinter.Tk()
+        window = tkinter.Tk()
 
-    window.title("flashcards (1.0)")
-    window.geometry("640x480")
-    window.resizable(False, False)
+        window.title("flashcards (1.0)")
+        window.geometry("640x480")
+        window.resizable(False, False)
 
-    window_icon = PhotoImage(file = "res/main_logo.png")
-    window.iconphoto(False, window_icon)
+        window_icon = PhotoImage(file = "res/main_logo.png")
+        window.iconphoto(False, window_icon)
 
-    logo_img = PhotoImage(file = "res/logo.png")
-    logo = tkinter.Label(window, image = logo_img)
-    logo.place(relx = 0.5, rely = 0.25, anchor = "center")
+        logo_img = PhotoImage(file = "res/logo.png")
+        logo = tkinter.Label(window, image = logo_img)
+        logo.place(relx = 0.5, rely = 0.25, anchor = "center")
 
-    view_button = tkinter.Button(window, text = "View Set", width = 20, height = 2, command = view_set)
-    view_button.place(relx = 0.5, rely = 0.55, anchor = "center")
+        view_button = tkinter.Button(window, text = "View Set", width = 20, height = 2, command = view_set)
+        view_button.place(relx = 0.5, rely = 0.55, anchor = "center")
 
-    create_button = tkinter.Button(window, text = "Create Set", width = 20, height = 2, command = create_set)
-    create_button.place(relx = 0.5, rely = 0.65, anchor = "center")
+        create_button = tkinter.Button(window, text = "Create Set", width = 20, height = 2, command = create_set)
+        create_button.place(relx = 0.5, rely = 0.65, anchor = "center")
 
-    edit_button = tkinter.Button(window, text = "Edit Set", width = 20, height = 2, command = lambda: edit_set(window))
-    edit_button.place(relx = 0.5, rely = 0.75, anchor = "center")
+        edit_button = tkinter.Button(window, text = "Edit Set", width = 20, height = 2, command = lambda: edit_set(window))
+        edit_button.place(relx = 0.5, rely = 0.75, anchor = "center")
 
-    exit_button = tkinter.Button(window, text = "Exit", width = 20, height = 2, command = lambda: exit(window))
-    exit_button.place(relx = 0.5, rely = 0.85, anchor = "center")
+        exit_button = tkinter.Button(window, text = "Exit", width = 20, height = 2, command = lambda: exit(window))
+        exit_button.place(relx = 0.5, rely = 0.85, anchor = "center")
 
-    window.mainloop()
+        window.mainloop()
+    except _tkinter.TclError:
+        window.destroy()
+
+        messagebox.showerror("Missing Resources", "Resources from the 'res' directory (or the directory itself) appear to be missing. Closing application.")
 
 # Opens upon clicking "View Set" from the starting menu; displays a screen to select a set to view
 def view_set():
@@ -352,7 +358,7 @@ def view(curr_window, sets):
 # Called upon clicking "Flip" from the flashcard view screen; flips from the front of the flashcard to the back (or back to front)
 def flip(curr_window, name, cards, curr_card, text):
     try:
-        logic.set_exists(name)
+        logic.set_still_exists(name)
 
         text.config(state = "normal")
 
