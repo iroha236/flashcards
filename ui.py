@@ -333,13 +333,13 @@ def view(curr_window, sets):
                 count = tkinter.Label(viewing_window, text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
                 count.place(relx = 0.355, rely = 0.93, anchor = "center")
 
-                flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(cards, curr_card, text))
+                flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(viewing_window, name, cards, curr_card, text))
                 flip_button.place(relx = 0.85, rely = 0.2, anchor = "center")
 
-                next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(name, cards, curr_card, text, count))
+                next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(viewing_window, name, cards, curr_card, text, count))
                 next_button.place(relx = 0.85, rely = 0.4, anchor = "center")
 
-                previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(name, cards, curr_card, text, count))
+                previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(viewing_window, name, cards, curr_card, text, count))
                 previous_button.place(relx = 0.85, rely = 0.6, anchor = "center")
 
                 finish_button = tkinter.Button(viewing_window, text = "Finish", width = 15, height = 2, command = lambda: exit(viewing_window))
@@ -350,36 +350,53 @@ def view(curr_window, sets):
             messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
 
 # Called upon clicking "Flip" from the flashcard view screen; flips from the front of the flashcard to the back (or back to front)
-def flip(cards, curr_card, text):
-    text.config(state = "normal")
+def flip(curr_window, name, cards, curr_card, text):
+    try:
+        logic.set_exists(name)
 
-    if(logic.show_front(cards[curr_card[0] - 1]) == text.get("1.0", "end-1c")):
-        text.delete("1.0", END)
-        text.insert(END, logic.show_back(cards[curr_card[0] - 1]))
-    else:
-        text.delete("1.0", END)
-        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "normal")
 
-    text.config(state = "disabled")
+        if(logic.show_front(cards[curr_card[0] - 1]) == text.get("1.0", "end-1c")):
+            text.delete("1.0", END)
+            text.insert(END, logic.show_back(cards[curr_card[0] - 1]))
+        else:
+            text.delete("1.0", END)
+            text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+
+        text.config(state = "disabled")
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)
 
 # Called upon clicking "Next" from the flashcard view screen; displays the next flashcard in the set
-def next(name, cards, curr_card, text, count):
-    curr_card[0] = logic.next_card(name, curr_card[0])
+def next(curr_window, name, cards, curr_card, text, count):
+    try:
+        curr_card[0] = logic.next_card(name, curr_card[0])
 
-    text.config(state = "normal")
-    text.delete("1.0", END)
-    text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-    text.config(state = "disabled")
+        text.config(state = "normal")
+        text.delete("1.0", END)
+        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "disabled")
 
-    count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+        count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)
 
 # Called upon clicking "Previous" from the flashcard view screen; displays the previous flashcard in the set
-def previous(name, cards, curr_card, text, count):
-    curr_card[0] = logic.previous_card(name, curr_card[0])
+def previous(curr_window, name, cards, curr_card, text, count):
+    try:
+        curr_card[0] = logic.previous_card(name, curr_card[0])
 
-    text.config(state = "normal")
-    text.delete("1.0", END)
-    text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-    text.config(state = "disabled")
+        text.config(state = "normal")
+        text.delete("1.0", END)
+        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "disabled")
 
-    count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+        count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)

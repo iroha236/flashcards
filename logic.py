@@ -163,3 +163,18 @@ def is_valid_card(card):
 # Switch to the flashcards directory (from the cards directory)
 def to_flashcards_dir():
     os.chdir("..")
+
+# Verify that the current set being viewed exists
+def set_exists(name):
+    curr_directory = os.getcwd()
+
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
+
+    storage.read_set(name)
+
+    os.chdir(curr_directory)
