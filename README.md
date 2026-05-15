@@ -25,6 +25,6 @@ _**Tcl/Tk**_ - 8.6
 
 1. Save the repository to a directory of your choice.
 
-2. Run `py -3.11 main.py` from terminal.
+2. From the directory, run `py -3.11 main.py` in terminal.
 
 ## Releases
