@@ -28,3 +28,5 @@ _**Tcl/Tk**_ - 8.6
 2. From the directory, run `py -3.11 main.py` in terminal.
 
 ## Releases
+
+The current release for the *flashcards* application is [v1.0](https://github.com/iroha236/flashcards/releases/tag/v1.0).
