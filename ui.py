@@ -13,7 +13,7 @@ def start():
 
     window = tkinter.Tk()
 
-    window.title("flashcards")
+    window.title("flashcards (1.0)")
     window.geometry("640x480")
     window.resizable(False, False)
 
