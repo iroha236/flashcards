@@ -6,6 +6,7 @@ def store_set(name, text):
     with open(name + ".txt", "w", encoding = "utf-8") as new_file:
         new_file.write(text)
 
+# Get the text of a set text file in the "cards" directory
 def read_set(name):
     set = open(name + ".txt", "r", encoding = "utf-8")
     text = set.read()
@@ -29,3 +30,7 @@ def set_exists(name):
 # Get the names of all sets in the "cards" directory
 def get_all_names():
     return glob.glob("*.txt")
+
+# Create the "cards" directory if it is missing
+def create_card_directory():
+    os.mkdir("cards")

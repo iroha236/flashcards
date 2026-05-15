@@ -6,7 +6,12 @@ import random
 def create_set(name, text):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     storage.store_set(name, text)
 
@@ -16,7 +21,12 @@ def create_set(name, text):
 def process_deletion(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
     
     storage.delete_set(name)
 
@@ -37,7 +47,12 @@ def verify_set_name(name):
 def verify_name_exists(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     exists = storage.set_exists(name)
 
@@ -59,8 +74,13 @@ def changes_occurred(name, text):
 # Get the names of all the sets in the cards directory
 def created_sets():
     curr_directory = os.getcwd()
+    
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
 
-    os.chdir("cards")
+        os.chdir("cards")
 
     names = storage.get_all_names()
 
@@ -72,7 +92,12 @@ def created_sets():
 def get_set_text(name):
     curr_directory = os.getcwd()
 
-    os.chdir("cards")
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
 
     set_text = storage.read_set(name)
 
@@ -134,3 +159,22 @@ def is_valid_card(card):
         return True
     
     return False
+
+# Switch to the flashcards directory (from the cards directory)
+def to_flashcards_dir():
+    os.chdir("..")
+
+# Verify that the current set being viewed exists
+def set_exists(name):
+    curr_directory = os.getcwd()
+
+    try:
+        os.chdir("cards")
+    except FileNotFoundError:
+        storage.create_card_directory()
+
+        os.chdir("cards")
+
+    storage.read_set(name)
+
+    os.chdir(curr_directory)

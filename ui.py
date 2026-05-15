@@ -205,11 +205,16 @@ def delete(curr_window, sets):
         confirm = messagebox.askquestion("Delete Set", "Delete '" + sets.get(sets.curselection()[0]) + "'?", parent = curr_window, default = "no")
 
         if(confirm == "yes"):
-            logic.process_deletion(sets.get(sets.curselection()[0]))
+            try:
+                logic.process_deletion(sets.get(sets.curselection()[0]))
 
-            curr_window.destroy()
+                curr_window.destroy()
 
-            messagebox.showinfo("Set Deletion Confirmation", "Set deleted successfully.")
+                messagebox.showinfo("Set Deletion Confirmation", "Set deleted successfully.")
+            except FileNotFoundError:
+                logic.to_flashcards_dir()
+
+                messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
         else:
             pass
 
@@ -220,43 +225,50 @@ def edit(curr_window, sets):
     else:
         name = sets.get(sets.curselection()[0])
 
-        curr_window.destroy()
+        try:
+            text = logic.get_set_text(name)
 
-        editing_window = Toplevel(window)
+            curr_window.destroy()
 
-        editing_window.title("Edit Set (Editing: " + name + ")")
-        editing_window.geometry("480x640")
-        editing_window.resizable(False, False)
-        editing_window.grab_set()
+            editing_window = Toplevel(window)
 
-        editing_window_icon = PhotoImage(file = "res/main_logo.png")
-        editing_window.iconphoto(False, editing_window_icon)
+            editing_window.title("Edit Set (Editing: " + name + ")")
+            editing_window.geometry("480x640")
+            editing_window.resizable(False, False)
+            editing_window.grab_set()
 
-        instructions_title = tkinter.Label(editing_window, text = "Instructions\n\nSpecify your flashcards in the form of a line of text.\n" +
-                                                                  "Example: What is 1 + 1?~2\n" +
-                                                                  "The text left of the '~' represents the front of the flashcard, while the\n" +
-                                                                  "the text right of it represents the back. Each line of text represents one\n" +
-                                                                  "flashcard, and you can write as many of them as you wish. Flashcards\n" +
-                                                                  "will be automatically randomized, so the order you write them in does not\n" +
-                                                                  "matter. Lastly, lines that do not match the specified pattern will be ignored\n" +
-                                                                  "when the flashcards are generated, so please follow the format properly.")
-        instructions_title.place(relx = 0.5, rely = 0.15, anchor = "center")
+            editing_window_icon = PhotoImage(file = "res/main_logo.png")
+            editing_window.iconphoto(False, editing_window_icon)
 
-        scrollbar = tkinter.Scrollbar(editing_window, orient = "horizontal")
+            instructions_title = tkinter.Label(editing_window, text = "Instructions\n\nSpecify your flashcards in the form of a line of text.\n" +
+                                                                    "Example: What is 1 + 1?~2\n" +
+                                                                    "The text left of the '~' represents the front of the flashcard, while the\n" +
+                                                                    "the text right of it represents the back. Each line of text represents one\n" +
+                                                                    "flashcard, and you can write as many of them as you wish. Flashcards\n" +
+                                                                    "will be automatically randomized, so the order you write them in does not\n" +
+                                                                    "matter. Lastly, lines that do not match the specified pattern will be ignored\n" +
+                                                                    "when the flashcards are generated, so please follow the format properly.")
+            instructions_title.place(relx = 0.5, rely = 0.15, anchor = "center")
 
-        box = scrolledtext.ScrolledText(editing_window, xscrollcommand = scrollbar.set, width = 50, height = 21, wrap = "none")
-        box.insert(tkinter.INSERT, logic.get_set_text(name))
-        box.focus()
-        box.place(relx = 0.5, rely = 0.57, anchor = "center")
+            scrollbar = tkinter.Scrollbar(editing_window, orient = "horizontal")
 
-        scrollbar.config(command = box.xview)
-        scrollbar.place(relx = 0.484, y = 542, anchor = "center", width = 405)
+            box = scrolledtext.ScrolledText(editing_window, xscrollcommand = scrollbar.set, width = 50, height = 21, wrap = "none")
+            box.insert(tkinter.INSERT, text)
+            box.focus()
+            box.place(relx = 0.5, rely = 0.57, anchor = "center")
 
-        save_button = tkinter.Button(editing_window, text = "Save", width = 20, height = 2, command = lambda: save(editing_window, name, box.get("1.0", "end-1c")))
-        save_button.place(relx = 0.7, rely = 0.925, anchor = "center")
+            scrollbar.config(command = box.xview)
+            scrollbar.place(relx = 0.484, y = 542, anchor = "center", width = 405)
 
-        leave_button = tkinter.Button(editing_window, text = "Leave", width = 20, height = 2, command = lambda: leave_edit(editing_window, name, box.get("1.0", "end-1c")))
-        leave_button.place(relx = 0.3, rely = 0.925, anchor = "center")
+            save_button = tkinter.Button(editing_window, text = "Save", width = 20, height = 2, command = lambda: save(editing_window, name, box.get("1.0", "end-1c")))
+            save_button.place(relx = 0.7, rely = 0.925, anchor = "center")
+
+            leave_button = tkinter.Button(editing_window, text = "Leave", width = 20, height = 2, command = lambda: leave_edit(editing_window, name, box.get("1.0", "end-1c")))
+            leave_button.place(relx = 0.3, rely = 0.925, anchor = "center")
+        except FileNotFoundError:
+            logic.to_flashcards_dir()
+
+            messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
 
 # Called upon clicking "Save" from the set editing screen; saves the set and gives a confirmation message
 def save(curr_window, name, text):
@@ -266,15 +278,25 @@ def save(curr_window, name, text):
 
 # Called upon clicking "Leave" from the set editing screen; either exits the editing screen or prompts users if they have unsaved changes
 def leave_edit(curr_window, name, text):
-    if(logic.changes_occurred(name, text)):
+    try:
+        if(logic.changes_occurred(name, text)):
+            confirm = messagebox.askquestion("Leave", "You have not saved your changes. Are you sure you want to leave?", parent = curr_window, default = "no")
+
+            if(confirm == "yes"):
+                curr_window.destroy()
+            else:
+                pass
+        else:
+            curr_window.destroy()
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
         confirm = messagebox.askquestion("Leave", "You have not saved your changes. Are you sure you want to leave?", parent = curr_window, default = "no")
 
         if(confirm == "yes"):
             curr_window.destroy()
         else:
             pass
-    else:
-        curr_window.destroy()
 
 # Called upon clicking "View" from the view set selection screen; opens an interface that lets users observe their flashcard sets
 # This includes flipping flashcards, proceeding to the next or previous flashcard, or finishing/exiting to the starting menu
@@ -284,75 +306,97 @@ def view(curr_window, sets):
     else:
         name = sets.get(sets.curselection()[0])
 
-        if(logic.num_cards(name) < 1):
-            messagebox.showwarning("No Valid Flashcards", "This set does not have any properly formatted flashcards. Please follow the flashcard creation instructions carefully.", parent = curr_window)
-        else:
-            cards = logic.get_cards(name)
-            curr_card = [1]
+        try:
+            if(logic.num_cards(name) < 1):
+                messagebox.showwarning("No Valid Flashcards", "This set does not have any properly formatted flashcards. Please follow the flashcard creation instructions carefully.", parent = curr_window)
+            else:
+                cards = logic.get_cards(name)
+                curr_card = [1]
 
-            curr_window.destroy()
+                curr_window.destroy()
 
-            viewing_window = Toplevel(window)
+                viewing_window = Toplevel(window)
 
-            viewing_window.title(name)
-            viewing_window.geometry("640x400")
-            viewing_window.resizable(False, False)
-            viewing_window.grab_set()
+                viewing_window.title(name)
+                viewing_window.geometry("640x400")
+                viewing_window.resizable(False, False)
+                viewing_window.grab_set()
 
-            viewing_window_icon = PhotoImage(file = "res/main_logo.png")
-            viewing_window.iconphoto(False, viewing_window_icon)
+                viewing_window_icon = PhotoImage(file = "res/main_logo.png")
+                viewing_window.iconphoto(False, viewing_window_icon)
 
-            text = scrolledtext.ScrolledText(viewing_window, width = 49, height = 20, wrap = tkinter.WORD)
-            text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-            text.config(state = "disabled")
-            text.place(relx = 0.38, rely = 0.475, anchor = "center")
+                text = scrolledtext.ScrolledText(viewing_window, width = 49, height = 20, wrap = tkinter.WORD)
+                text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+                text.config(state = "disabled")
+                text.place(relx = 0.38, rely = 0.475, anchor = "center")
 
-            count = tkinter.Label(viewing_window, text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
-            count.place(relx = 0.355, rely = 0.93, anchor = "center")
+                count = tkinter.Label(viewing_window, text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+                count.place(relx = 0.355, rely = 0.93, anchor = "center")
 
-            flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(cards, curr_card, text))
-            flip_button.place(relx = 0.85, rely = 0.2, anchor = "center")
+                flip_button = tkinter.Button(viewing_window, text = "Flip", width = 15, height = 2, command = lambda: flip(viewing_window, name, cards, curr_card, text))
+                flip_button.place(relx = 0.85, rely = 0.2, anchor = "center")
 
-            next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(name, cards, curr_card, text, count))
-            next_button.place(relx = 0.85, rely = 0.4, anchor = "center")
+                next_button = tkinter.Button(viewing_window, text = "Next", width = 15, height = 2, command = lambda: next(viewing_window, name, cards, curr_card, text, count))
+                next_button.place(relx = 0.85, rely = 0.4, anchor = "center")
 
-            previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(name, cards, curr_card, text, count))
-            previous_button.place(relx = 0.85, rely = 0.6, anchor = "center")
+                previous_button = tkinter.Button(viewing_window, text = "Previous", width = 15, height = 2, command = lambda: previous(viewing_window, name, cards, curr_card, text, count))
+                previous_button.place(relx = 0.85, rely = 0.6, anchor = "center")
 
-            finish_button = tkinter.Button(viewing_window, text = "Finish", width = 15, height = 2, command = lambda: exit(viewing_window))
-            finish_button.place(relx = 0.85, rely = 0.8, anchor = "center")
+                finish_button = tkinter.Button(viewing_window, text = "Finish", width = 15, height = 2, command = lambda: exit(viewing_window))
+                finish_button.place(relx = 0.85, rely = 0.8, anchor = "center")
+        except FileNotFoundError:
+            logic.to_flashcards_dir()
+
+            messagebox.showwarning("Could Not Find Selected Set", "The selected set could not be found. Try closing and reopening the current window, as it may be outdated.", parent = curr_window)
 
 # Called upon clicking "Flip" from the flashcard view screen; flips from the front of the flashcard to the back (or back to front)
-def flip(cards, curr_card, text):
-    text.config(state = "normal")
+def flip(curr_window, name, cards, curr_card, text):
+    try:
+        logic.set_exists(name)
 
-    if(logic.show_front(cards[curr_card[0] - 1]) == text.get("1.0", "end-1c")):
-        text.delete("1.0", END)
-        text.insert(END, logic.show_back(cards[curr_card[0] - 1]))
-    else:
-        text.delete("1.0", END)
-        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "normal")
 
-    text.config(state = "disabled")
+        if(logic.show_front(cards[curr_card[0] - 1]) == text.get("1.0", "end-1c")):
+            text.delete("1.0", END)
+            text.insert(END, logic.show_back(cards[curr_card[0] - 1]))
+        else:
+            text.delete("1.0", END)
+            text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+
+        text.config(state = "disabled")
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)
 
 # Called upon clicking "Next" from the flashcard view screen; displays the next flashcard in the set
-def next(name, cards, curr_card, text, count):
-    curr_card[0] = logic.next_card(name, curr_card[0])
+def next(curr_window, name, cards, curr_card, text, count):
+    try:
+        curr_card[0] = logic.next_card(name, curr_card[0])
 
-    text.config(state = "normal")
-    text.delete("1.0", END)
-    text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-    text.config(state = "disabled")
+        text.config(state = "normal")
+        text.delete("1.0", END)
+        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "disabled")
 
-    count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+        count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)
 
 # Called upon clicking "Previous" from the flashcard view screen; displays the previous flashcard in the set
-def previous(name, cards, curr_card, text, count):
-    curr_card[0] = logic.previous_card(name, curr_card[0])
+def previous(curr_window, name, cards, curr_card, text, count):
+    try:
+        curr_card[0] = logic.previous_card(name, curr_card[0])
 
-    text.config(state = "normal")
-    text.delete("1.0", END)
-    text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
-    text.config(state = "disabled")
+        text.config(state = "normal")
+        text.delete("1.0", END)
+        text.insert(END, logic.show_front(cards[curr_card[0] - 1]))
+        text.config(state = "disabled")
 
-    count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+        count.config(text = str(curr_card[0]) + "/" + str(logic.num_cards(name)))
+    except FileNotFoundError:
+        logic.to_flashcards_dir()
+
+        messagebox.showwarning("Set No Longer Found", "The current set no longer seems to exist. Try viewing your sets again, as the available sets may have changed.", parent = curr_window)
